@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphics Cards Database Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Graphics Cards Database Dashboard</h1>
+            <p>Compare MySQL (SQL) vs MongoDB (NoSQL) operations</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('mysql')">MySQL (SQL)</button>
+            <button class="tab-button" onclick="switchTab('mongodb')">MongoDB (NoSQL)</button>
+        </div>
+
+        <!-- MySQL Tab -->
+        <div id="mysql-tab" class="tab-content active">
+            <div class="actions">
+                <button class="btn btn-primary" onclick="openModal('mysql', 'create')">➕ Add New Card</button>
+                <button class="btn btn-secondary" onclick="loadCards('mysql')">🔄 Refresh</button>
+            </div>
+            <div id="mysql-cards" class="cards-grid">
+                <div class="loading">Loading cards...</div>
+            </div>
+        </div>
+
+        <!-- MongoDB Tab -->
+        <div id="mongodb-tab" class="tab-content">
+            <div class="actions">
+                <button class="btn btn-primary" onclick="openModal('mongodb', 'create')">➕ Add New Card</button>
+                <button class="btn btn-secondary" onclick="loadCards('mongodb')">🔄 Refresh</button>
+            </div>
+            <div id="mongodb-cards" class="cards-grid">
+                <div class="loading">Loading cards...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Create/Edit -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title">Add Graphics Card</h2>
+            <form id="card-form">
+                <input type="hidden" id="card-id" name="id">
+                <input type="hidden" id="db-type" name="db_type">
+                
+                <div class="form-group">
+                    <label for="name">Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="manufacturer">Manufacturer *</label>
+                    <input type="text" id="manufacturer" name="manufacturer" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="model">Model *</label>
+                    <input type="text" id="model" name="model" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="memory_gb">Memory (GB) *</label>
+                        <input type="number" id="memory_gb" name="memory_gb" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="memory_type">Memory Type *</label>
+                        <select id="memory_type" name="memory_type" required>
+                            <option value="">Select...</option>
+                            <option value="GDDR6">GDDR6</option>
+                            <option value="GDDR6X">GDDR6X</option>
+                            <option value="GDDR5">GDDR5</option>
+                            <option value="GDDR5X">GDDR5X</option>
+                            <option value="HBM2">HBM2</option>
+                            <option value="HBM3">HBM3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="core_clock_mhz">Core Clock (MHz) *</label>
+                        <input type="number" id="core_clock_mhz" name="core_clock_mhz" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="boost_clock_mhz">Boost Clock (MHz)</label>
+                        <input type="number" id="boost_clock_mhz" name="boost_clock_mhz" min="1">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price_usd">Price (USD)</label>
+                        <input type="number" id="price_usd" name="price_usd" min="0" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="release_date">Release Date</label>
+                        <input type="date" id="release_date" name="release_date">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
