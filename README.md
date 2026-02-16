@@ -1,7 +1,7 @@
 # TIQC-internship-week3-Chen
 # Graphics Cards Database Dashboard
 
-A web application that demonstrates CRUD operations on graphics cards data using both **MySQL (SQL)** and **MongoDB (NoSQL)** databases. This project allows you to compare how data is handled differently in SQL vs NoSQL databases.
+A web application that demonstrates CRUD operations on graphics cards data using both **MySQL (SQL)** and **MongoDB (NoSQL)** databases. For a graphics card inventory database, such as one used in an online storefront, MySQL is the better choice due to the structured nature of the data, data accuracy, and complex querying.
 
 ## Features
 
