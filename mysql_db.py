@@ -112,11 +112,40 @@ class MySQLDatabase:
             print(f"Error creating record: {e}")
             raise
     
-    def read_all(self):
-        """Read all graphics cards"""
+    def read_all(self, filters=None):
+        """Read graphics cards with optional search and filters.
+        filters: dict with optional keys: search, manufacturer, memory_type,
+                 memory_min, memory_max, price_min, price_max
+        """
         try:
             with self.connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM graphics_cards ORDER BY id DESC")
+                sql = "SELECT * FROM graphics_cards WHERE 1=1"
+                values = []
+                if filters:
+                    if filters.get('search'):
+                        sql += " AND (name LIKE %s OR manufacturer LIKE %s OR model LIKE %s)"
+                        term = f"%{filters['search']}%"
+                        values.extend([term, term, term])
+                    if filters.get('manufacturer'):
+                        sql += " AND manufacturer = %s"
+                        values.append(filters['manufacturer'])
+                    if filters.get('memory_type'):
+                        sql += " AND memory_type = %s"
+                        values.append(filters['memory_type'])
+                    if filters.get('memory_min') is not None:
+                        sql += " AND memory_gb >= %s"
+                        values.append(int(filters['memory_min']))
+                    if filters.get('memory_max') is not None:
+                        sql += " AND memory_gb <= %s"
+                        values.append(int(filters['memory_max']))
+                    if filters.get('price_min') is not None:
+                        sql += " AND (price_usd IS NULL OR price_usd >= %s)"
+                        values.append(float(filters['price_min']))
+                    if filters.get('price_max') is not None:
+                        sql += " AND (price_usd IS NULL OR price_usd <= %s)"
+                        values.append(float(filters['price_max']))
+                sql += " ORDER BY id DESC"
+                cursor.execute(sql, values or None)
                 return cursor.fetchall()
         except pymysql.Error as e:
             print(f"Error reading records: {e}")

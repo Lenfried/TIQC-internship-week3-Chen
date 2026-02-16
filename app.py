@@ -16,13 +16,44 @@ def index():
     """Serve the dashboard page"""
     return render_template('dashboard.html')
 
+def _parse_filters():
+    """Parse search/filter query params from request."""
+    filters = {}
+    if request.args.get('search'):
+        filters['search'] = request.args.get('search').strip()
+    if request.args.get('manufacturer'):
+        filters['manufacturer'] = request.args.get('manufacturer').strip()
+    if request.args.get('memory_type'):
+        filters['memory_type'] = request.args.get('memory_type').strip()
+    try:
+        if request.args.get('memory_min') not in (None, ''):
+            filters['memory_min'] = int(request.args.get('memory_min'))
+    except (TypeError, ValueError):
+        pass
+    try:
+        if request.args.get('memory_max') not in (None, ''):
+            filters['memory_max'] = int(request.args.get('memory_max'))
+    except (TypeError, ValueError):
+        pass
+    try:
+        if request.args.get('price_min') not in (None, ''):
+            filters['price_min'] = float(request.args.get('price_min'))
+    except (TypeError, ValueError):
+        pass
+    try:
+        if request.args.get('price_max') not in (None, ''):
+            filters['price_max'] = float(request.args.get('price_max'))
+    except (TypeError, ValueError):
+        pass
+    return filters if filters else None
+
 # MySQL Routes
 @app.route('/api/mysql/cards', methods=['GET'])
 def mysql_get_all():
-    """Get all graphics cards from MySQL"""
+    """Get graphics cards from MySQL with optional search/filters"""
     try:
-        cards = mysql_db.read_all()
-        # Convert Decimal and date objects to strings for JSON serialization
+        filters = _parse_filters()
+        cards = mysql_db.read_all(filters=filters)
         for card in cards:
             if 'price_usd' in card and card['price_usd'] is not None:
                 card['price_usd'] = float(card['price_usd'])
@@ -74,9 +105,10 @@ def mysql_delete(card_id):
 # MongoDB Routes
 @app.route('/api/mongodb/cards', methods=['GET'])
 def mongodb_get_all():
-    """Get all graphics cards from MongoDB"""
+    """Get graphics cards from MongoDB with optional search/filters"""
     try:
-        cards = mongodb_db.read_all()
+        filters = _parse_filters()
+        cards = mongodb_db.read_all(filters=filters)
         return jsonify({'success': True, 'data': cards})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

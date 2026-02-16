@@ -25,13 +25,60 @@ function switchTab(db) {
     document.getElementById(`${db}-tab`).classList.add('active');
 }
 
-// Load cards from database
+// Get current filter values for a database tab
+function getFilters(db) {
+    const prefix = db === 'mysql' ? 'mysql' : 'mongodb';
+    const search = document.getElementById(`${prefix}-search`);
+    const manufacturer = document.getElementById(`${prefix}-manufacturer`);
+    const memoryType = document.getElementById(`${prefix}-memory-type`);
+    const memoryMin = document.getElementById(`${prefix}-memory-min`);
+    const memoryMax = document.getElementById(`${prefix}-memory-max`);
+    const priceMin = document.getElementById(`${prefix}-price-min`);
+    const priceMax = document.getElementById(`${prefix}-price-max`);
+    const params = new URLSearchParams();
+    if (search && search.value.trim()) params.set('search', search.value.trim());
+    if (manufacturer && manufacturer.value) params.set('manufacturer', manufacturer.value);
+    if (memoryType && memoryType.value) params.set('memory_type', memoryType.value);
+    if (memoryMin && memoryMin.value !== '') params.set('memory_min', memoryMin.value);
+    if (memoryMax && memoryMax.value !== '') params.set('memory_max', memoryMax.value);
+    if (priceMin && priceMin.value !== '') params.set('price_min', priceMin.value);
+    if (priceMax && priceMax.value !== '') params.set('price_max', priceMax.value);
+    return params.toString();
+}
+
+// Debounce timer for search input
+let searchDebounceTimer = null;
+
+function debouncedApplyFilters(db) {
+    if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(function() { applyFilters(db); }, 350);
+}
+
+// Apply filters (reload with current filter values)
+function applyFilters(db) {
+    loadCards(db);
+}
+
+// Clear filter inputs for a tab
+function clearFilters(db) {
+    const prefix = db === 'mysql' ? 'mysql' : 'mongodb';
+    const ids = ['search', 'manufacturer', 'memory-type', 'memory-min', 'memory-max', 'price-min', 'price-max'];
+    ids.forEach(id => {
+        const el = document.getElementById(`${prefix}-${id}`);
+        if (el) el.value = '';
+    });
+}
+
+// Load cards from database (with optional query string from filters)
 async function loadCards(db) {
     const container = document.getElementById(`${db}-cards`);
     container.innerHTML = '<div class="loading">Loading cards...</div>';
     
+    const queryString = getFilters(db);
+    const url = queryString ? `/api/${db}/cards?${queryString}` : `/api/${db}/cards`;
+    
     try {
-        const response = await fetch(`/api/${db}/cards`);
+        const response = await fetch(url);
         const result = await response.json();
         
         if (result.success) {
@@ -219,7 +266,7 @@ async function deleteCard(db, cardId) {
         const result = await response.json();
         
         if (result.success) {
-            loadCards(db);
+            loadCards(db);  // reload with current filters
             alert('Card deleted successfully!');
         } else {
             alert('Error: ' + result.error);

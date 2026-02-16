@@ -53,15 +53,51 @@ class MongoDBDatabase:
             print(f"Error creating document: {e}")
             raise
     
-    def read_all(self):
-        """Read all graphics cards"""
+    def read_all(self, filters=None):
+        """Read graphics cards with optional search and filters.
+        filters: dict with optional keys: search, manufacturer, memory_type,
+                 memory_min, memory_max, price_min, price_max
+        """
         try:
-            cursor = self.collection.find().sort('_id', -1)
+            query = {}
+            if filters:
+                if filters.get('search'):
+                    from bson.regex import Regex
+                    term = filters['search'].strip()
+                    if term:
+                        query['$or'] = [
+                            {'name': Regex(term, 'i')},
+                            {'manufacturer': Regex(term, 'i')},
+                            {'model': Regex(term, 'i')}
+                        ]
+                if filters.get('manufacturer'):
+                    query['manufacturer'] = filters['manufacturer']
+                if filters.get('memory_type'):
+                    query['memory_type'] = filters['memory_type']
+                mem_min = filters.get('memory_min')
+                mem_max = filters.get('memory_max')
+                if mem_min is not None or mem_max is not None:
+                    query['memory_gb'] = {}
+                    if mem_min is not None:
+                        query['memory_gb']['$gte'] = int(mem_min)
+                    if mem_max is not None:
+                        query['memory_gb']['$lte'] = int(mem_max)
+                price_min = filters.get('price_min')
+                price_max = filters.get('price_max')
+                if price_min is not None or price_max is not None:
+                    price_cond = {}
+                    if price_min is not None:
+                        price_cond['$gte'] = float(price_min)
+                    if price_max is not None:
+                        price_cond['$lte'] = float(price_max)
+                    query.setdefault('$and', []).append(
+                        {'$or': [{'price_usd': price_cond}, {'price_usd': None}]}
+                    )
+            cursor = self.collection.find(query).sort('_id', -1)
             cards = []
             for doc in cursor:
                 doc['id'] = str(doc['_id'])
                 del doc['_id']
-                # Convert datetime objects to strings for JSON serialization
                 if 'created_at' in doc:
                     doc['created_at'] = doc['created_at'].isoformat()
                 if 'updated_at' in doc:

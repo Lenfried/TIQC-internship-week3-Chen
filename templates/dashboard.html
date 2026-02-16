@@ -20,6 +20,28 @@
 
         <!-- MySQL Tab -->
         <div id="mysql-tab" class="tab-content active">
+            <div class="filter-bar">
+                <input type="text" id="mysql-search" class="search-input" placeholder="Search name, manufacturer, model..." oninput="debouncedApplyFilters('mysql')">
+                <select id="mysql-manufacturer" class="filter-select" onchange="applyFilters('mysql')">
+                    <option value="">All manufacturers</option>
+                    <option value="NVIDIA">NVIDIA</option>
+                    <option value="AMD">AMD</option>
+                </select>
+                <select id="mysql-memory-type" class="filter-select" onchange="applyFilters('mysql')">
+                    <option value="">All memory types</option>
+                    <option value="GDDR6">GDDR6</option>
+                    <option value="GDDR6X">GDDR6X</option>
+                    <option value="GDDR5">GDDR5</option>
+                    <option value="GDDR5X">GDDR5X</option>
+                    <option value="HBM2">HBM2</option>
+                    <option value="HBM3">HBM3</option>
+                </select>
+                <input type="number" id="mysql-memory-min" class="filter-number" placeholder="Min GB" min="0" onchange="applyFilters('mysql')">
+                <input type="number" id="mysql-memory-max" class="filter-number" placeholder="Max GB" min="0" onchange="applyFilters('mysql')">
+                <input type="number" id="mysql-price-min" class="filter-number" placeholder="Min $" min="0" step="1" onchange="applyFilters('mysql')">
+                <input type="number" id="mysql-price-max" class="filter-number" placeholder="Max $" min="0" step="1" onchange="applyFilters('mysql')">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="clearFilters('mysql'); loadCards('mysql');">Clear</button>
+            </div>
             <div class="actions">
                 <button class="btn btn-primary" onclick="openModal('mysql', 'create')">➕ Add New Card</button>
                 <button class="btn btn-secondary" onclick="loadCards('mysql')">🔄 Refresh</button>
@@ -31,6 +53,28 @@
 
         <!-- MongoDB Tab -->
         <div id="mongodb-tab" class="tab-content">
+            <div class="filter-bar">
+                <input type="text" id="mongodb-search" class="search-input" placeholder="Search name, manufacturer, model..." oninput="debouncedApplyFilters('mongodb')">
+                <select id="mongodb-manufacturer" class="filter-select" onchange="applyFilters('mongodb')">
+                    <option value="">All manufacturers</option>
+                    <option value="NVIDIA">NVIDIA</option>
+                    <option value="AMD">AMD</option>
+                </select>
+                <select id="mongodb-memory-type" class="filter-select" onchange="applyFilters('mongodb')">
+                    <option value="">All memory types</option>
+                    <option value="GDDR6">GDDR6</option>
+                    <option value="GDDR6X">GDDR6X</option>
+                    <option value="GDDR5">GDDR5</option>
+                    <option value="GDDR5X">GDDR5X</option>
+                    <option value="HBM2">HBM2</option>
+                    <option value="HBM3">HBM3</option>
+                </select>
+                <input type="number" id="mongodb-memory-min" class="filter-number" placeholder="Min GB" min="0" onchange="applyFilters('mongodb')">
+                <input type="number" id="mongodb-memory-max" class="filter-number" placeholder="Max GB" min="0" onchange="applyFilters('mongodb')">
+                <input type="number" id="mongodb-price-min" class="filter-number" placeholder="Min $" min="0" step="1" onchange="applyFilters('mongodb')">
+                <input type="number" id="mongodb-price-max" class="filter-number" placeholder="Max $" min="0" step="1" onchange="applyFilters('mongodb')">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="clearFilters('mongodb'); loadCards('mongodb');">Clear</button>
+            </div>
             <div class="actions">
                 <button class="btn btn-primary" onclick="openModal('mongodb', 'create')">➕ Add New Card</button>
                 <button class="btn btn-secondary" onclick="loadCards('mongodb')">🔄 Refresh</button>
